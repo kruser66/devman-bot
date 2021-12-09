@@ -57,7 +57,7 @@ def long_pulling(token):
         params['timestamp'] = data['timestamp_to_request']
     elif data['status'] == 'found':
         bot_send_messages(tg_chat_id, data)
-        params['timestamp'] = data['timestamp_to_request']
+        params['timestamp'] = data['last_attempt_timestamp']
 
 
 if __name__ == '__main__':
