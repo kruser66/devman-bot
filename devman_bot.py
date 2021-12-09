@@ -3,20 +3,6 @@ import requests
 import telegram
 from time import sleep
 from dotenv import load_dotenv
-from pprint import pprint
-
-
-def fetch_user_reviews(token):
-    url = 'https://dvmn.org/api/user_reviews/'
-
-    headers = {
-        'Authorization': token,
-    }
-
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-
-    return response.json()
 
 
 def bot_send_messages(chat_id, json):
@@ -38,7 +24,7 @@ def bot_send_messages(chat_id, json):
         )
 
 
-def long_pulling(token):
+def long_polling(token):
     url = 'https://dvmn.org/api/long_polling/'
 
     headers = {
@@ -52,7 +38,6 @@ def long_pulling(token):
     response.raise_for_status()
 
     data = response.json()
-    pprint(data)
     if data['status'] == 'timeout':
         params['timestamp'] = data['timestamp_to_request']
     elif data['status'] == 'found':
@@ -65,14 +50,13 @@ if __name__ == '__main__':
     load_dotenv()
     devman_api_token = os.getenv('DEVMAN_API_TOKEN')
     tg_bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-    tg_chat_id = os.getenv('TG_CHAT_ID_FOR_MESSAGE')
+    tg_chat_id = os.getenv('TELEGRAM_CHAT_ID')
 
     bot = telegram.Bot(token=tg_bot_token)
 
-    # pprint(fetch_user_reviews(devman_api_token))
     while True:
         try:
-            long_pulling(devman_api_token)
+            long_polling(devman_api_token)
 
         except requests.exceptions.ReadTimeout:
             print('LongPull Timeout')
