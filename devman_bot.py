@@ -3,7 +3,7 @@ import requests
 import telegram
 from time import sleep
 from dotenv import load_dotenv
-
+from pprint import pprint
 
 def bot_send_messages(chat_id, json):
 
@@ -17,11 +17,14 @@ def bot_send_messages(chat_id, json):
             Можете приступать к следующему заданию_
             '''
         link = '[Ссылка на Вашу работу]({})'.format(attempt['lesson_url'])
-        bot.send_message(
-            chat_id=chat_id,
-            text=f'{title}\n\n{link}\n\n{correct}',
-            parse_mode=telegram.ParseMode.MARKDOWN_V2
-        )
+        try:
+            bot.send_message(
+                chat_id=chat_id,
+                text=f'{title}\n\n{link}\n\n{correct}',
+                parse_mode=telegram.ParseMode.MARKDOWN_V2
+            )
+        except telegram.error.TimedOut:
+            print('Telegram TimeOut')
 
 
 def long_polling(token):
@@ -36,8 +39,8 @@ def long_polling(token):
 
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
-
     data = response.json()
+    pprint(data)
     if data['status'] == 'timeout':
         params['timestamp'] = data['timestamp_to_request']
     elif data['status'] == 'found':
