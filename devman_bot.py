@@ -5,9 +5,9 @@ from time import sleep
 from dotenv import load_dotenv
 from pprint import pprint
 
-def bot_send_messages(bot, chat_id, json):
+def bot_send_messages(bot, chat_id, server_answer):
 
-    for attempt in json['new_attempts']:
+    for attempt in server_answer['new_attempts']:
         title = 'У Вас проверили работу:\n"{}"'.format(attempt['lesson_title'])
         if attempt['is_negative']:
             correct = '_К сожалению, в работе нашлись ошибки_'
@@ -42,13 +42,14 @@ def long_polling(token, bot, chat_id, timeout=90):
             timeout=timeout
         )
         response.raise_for_status()
-        data = response.json()
 
-        if data['status'] == 'timeout':
-            params['timestamp'] = data['timestamp_to_request']
-        elif data['status'] == 'found':
-            bot_send_messages(bot, chat_id, data)
-            params['timestamp'] = data['last_attempt_timestamp']
+        server_answer = response.json()
+
+        if server_answer['status'] == 'timeout':
+            params['timestamp'] = server_answer['timestamp_to_request']
+        elif server_answer['status'] == 'found':
+            bot_send_messages(bot, chat_id, server_answer)
+            params['timestamp'] = server_answer['last_attempt_timestamp']
 
 
 if __name__ == '__main__':
@@ -62,10 +63,10 @@ if __name__ == '__main__':
 
     while True:
         try:
-            long_polling(api_token, bot, chat_id, timeout=10)
-
+            response = long_polling(api_token, bot, chat_id, timeout=10)
+            pprint(response)
         except requests.exceptions.ReadTimeout:
-            print('LongPull ReadTimeout')
+            pass
         except requests.exceptions.ConnectionError:
             print('Connection Error')
             sleep(10)
