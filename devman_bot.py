@@ -24,14 +24,11 @@ def bot_send_messages(bot, chat_id, server_answer):
         )
 
 
-def long_polling(token, bot, chat_id, timeout=90):
+def long_polling(token, params, bot, chat_id, timeout=90):
     api_url = 'https://dvmn.org/api/long_polling/'
 
     headers = {
         'Authorization': token,
-    }
-    params = {
-        'timestamp': None,
     }
 
     while True:
@@ -42,7 +39,6 @@ def long_polling(token, bot, chat_id, timeout=90):
             timeout=timeout
         )
         response.raise_for_status()
-
         server_answer = response.json()
 
         if server_answer['status'] == 'timeout':
@@ -50,6 +46,8 @@ def long_polling(token, bot, chat_id, timeout=90):
         elif server_answer['status'] == 'found':
             bot_send_messages(bot, chat_id, server_answer)
             params['timestamp'] = server_answer['last_attempt_timestamp']
+
+        return server_answer, params
 
 
 if __name__ == '__main__':
@@ -60,11 +58,21 @@ if __name__ == '__main__':
     chat_id = os.getenv('TELEGRAM_CHAT_ID')
 
     bot = telegram.Bot(token=bot_token)
+    params = {
+        'timestamp': None,
+    }
 
     while True:
         try:
-            response = long_polling(api_token, bot, chat_id, timeout=10)
+            response, params = long_polling(
+                api_token,
+                params,
+                bot,
+                chat_id,
+                timeout=10
+            )
             pprint(response)
+
         except requests.exceptions.ReadTimeout:
             pass
         except requests.exceptions.ConnectionError:
