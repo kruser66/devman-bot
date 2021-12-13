@@ -3,7 +3,6 @@ import requests
 import telegram
 from time import sleep
 from dotenv import load_dotenv
-from pprint import pprint
 
 def bot_send_messages(bot, chat_id, server_answer):
 
@@ -39,15 +38,15 @@ def long_polling(token, params, bot, chat_id, timeout=90):
             timeout=timeout
         )
         response.raise_for_status()
-        server_answer = response.json()
+        checking = response.json()
 
-        if server_answer['status'] == 'timeout':
-            params['timestamp'] = server_answer['timestamp_to_request']
-        elif server_answer['status'] == 'found':
-            bot_send_messages(bot, chat_id, server_answer)
-            params['timestamp'] = server_answer['last_attempt_timestamp']
+        if checking['status'] == 'timeout':
+            params['timestamp'] = checking['timestamp_to_request']
+        elif checking['status'] == 'found':
+            bot_send_messages(bot, chat_id, checking)
+            params['timestamp'] = checking['last_attempt_timestamp']
 
-        return server_answer, params
+        return checking, params
 
 
 if __name__ == '__main__':
@@ -71,7 +70,6 @@ if __name__ == '__main__':
                 chat_id,
                 timeout=10
             )
-            pprint(response)
 
         except requests.exceptions.ReadTimeout:
             pass
