@@ -1,8 +1,10 @@
 import os
 import requests
+import logging
 import telegram
 from time import sleep
 from dotenv import load_dotenv
+
 
 def bot_send_messages(bot, chat_id, server_answer):
 
@@ -55,6 +57,9 @@ if __name__ == '__main__':
     api_token = os.environ['DEVMAN_API_TOKEN']
     bot_token = os.environ['TELEGRAM_BOT_TOKEN']
     chat_id = os.environ['TELEGRAM_CHAT_ID']
+    
+    logging.basicConfig(level=logging.INFO)
+    logging.info('Запущен бот')
 
     bot = telegram.Bot(token=bot_token)
     params = {
