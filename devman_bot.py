@@ -12,7 +12,7 @@ def bot_send_messages(bot, chat_id, server_answer):
             correct = '_К сожалению, в работе нашлись ошибки_'
         else:
             correct = '''
-            _Преподавателю все понравилось!
+            _Преподавателю все понравилось\n
             Можете приступать к следующему заданию_
             '''
         link = '[Ссылка на Вашу работу]({})'.format(attempt['lesson_url'])
@@ -52,9 +52,9 @@ def long_polling(token, params, bot, chat_id, timeout=90):
 if __name__ == '__main__':
 
     load_dotenv()
-    api_token = os.getenv('DEVMAN_API_TOKEN')
-    bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-    chat_id = os.getenv('TELEGRAM_CHAT_ID')
+    api_token = os.environ['DEVMAN_API_TOKEN']
+    bot_token = os.environ['TELEGRAM_BOT_TOKEN']
+    chat_id = os.environ['TELEGRAM_CHAT_ID']
 
     bot = telegram.Bot(token=bot_token)
     params = {
