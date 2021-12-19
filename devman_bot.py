@@ -51,17 +51,33 @@ def long_polling(token, params, bot, chat_id, timeout=90):
         return checking, params
 
 
+class TgLogsHandler(logging.Handler):
+
+    def __init__(self, tg_bot, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = tg_bot
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
+
 if __name__ == '__main__':
 
     load_dotenv()
     api_token = os.environ['DEVMAN_API_TOKEN']
     bot_token = os.environ['TELEGRAM_BOT_TOKEN']
     chat_id = os.environ['TELEGRAM_CHAT_ID']
-    
-    logging.basicConfig(level=logging.INFO)
-    logging.info('Запущен бот')
 
-    bot = telegram.Bot(token=bot_token)
+    tg_bot = telegram.Bot(token=bot_token)
+
+    logger = logging.getLogger("Телеграм логгер")
+    logger.setLevel(logging.INFO)
+    logger.addHandler(TgLogsHandler(tg_bot, chat_id))
+
+    logger.info('Запущен devman_bot')
+
     params = {
         'timestamp': None,
     }
@@ -71,15 +87,14 @@ if __name__ == '__main__':
             response, params = long_polling(
                 api_token,
                 params,
-                bot,
+                tg_bot,
                 chat_id,
-                timeout=10
+                timeout=10,
             )
-
         except requests.exceptions.ReadTimeout:
             pass
-        except requests.exceptions.ConnectionError:
-            print('Connection Error')
+        except requests.exceptions.ConnectionError as err:
+            logger.error(err, exc_info=True)
             sleep(10)
-        except telegram.error.TimedOut:
-            print('Telegram TimeOut')
+        except Exception as err:
+            logger.error(err, exc_info=True)
