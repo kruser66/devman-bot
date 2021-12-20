@@ -5,6 +5,8 @@ import telegram
 from time import sleep
 from dotenv import load_dotenv
 
+logger = logging.getLogger("Телеграм_логгер")
+
 
 def bot_send_messages(bot, chat_id, server_answer):
 
@@ -72,7 +74,6 @@ if __name__ == '__main__':
 
     tg_bot = telegram.Bot(token=bot_token)
 
-    logger = logging.getLogger("Телеграм логгер")
     logger.setLevel(logging.INFO)
     logger.addHandler(TgLogsHandler(tg_bot, chat_id))
 
@@ -93,8 +94,8 @@ if __name__ == '__main__':
             )
         except requests.exceptions.ReadTimeout:
             pass
-        except requests.exceptions.ConnectionError as err:
-            logger.error(err, exc_info=True)
+        except requests.exceptions.ConnectionError:
+            logger.exception('devman_bot')
             sleep(10)
-        except Exception as err:
-            logger.error(err, exc_info=True)
+        except Exception:
+            logger.exception('devman_bot')
