@@ -26,22 +26,36 @@ python devman_bot.py
 
 Для корректной работы модуля необходимы следующие переменные окружения:
 
-Devman API token взять в разделе "Профиль"
-
 ```python
-DEVMAN_API_TOKEN = 'YOUR_AUTORIZATION_TOKEN'
+DEVMAN_API_TOKEN='YOUR_AUTORIZATION_TOKEN'
+TELEGRAM_BOT_TOKEN='YOUR_TELEGRAM_BOT_TOKEN'
+TELEGRAM_CHAT_ID='YOUR_CHAT_ID'
 ```
 
-Telegram bot token для своего бота можно узнать у бота `@BotFather`
+## Docker
 
-```python
-TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+1. Создание образа.
+
+```bash
+docker build --tag devman_bot .
 ```
 
-Ваш `chat_id` можете узнать у бота `@userinfobot`
+2. Запуск контейнера.
 
-```python
-TELEGRAM_CHAT_ID = YOUR_CHAT_ID
+* с указание переменных окружения в командной строке:
+
+```bash
+docker run -d \ 
+-e DEVMAN_API_TOKEN='YOUR_AUTORIZATION_TOKEN' \
+-e TELEGRAM_BOT_TOKEN='YOUR_TELEGRAM_BOT_TOKEN' \
+-e TELEGRAM_CHAT_ID='YOUR_CHAT_ID' \ 
+--name container_name kruser66/devman_bot
+```
+
+* создайте файл `.env` с перемнными окружения:
+
+```bash
+docker run -d --env-file .env --name container_name kruser66/devman_bot
 ```
 
 ## Цель проекта
