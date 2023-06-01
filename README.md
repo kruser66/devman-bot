@@ -36,6 +36,8 @@ TELEGRAM_CHAT_ID='YOUR_CHAT_ID'
 
 1. Создание образа.
 
+Находясь в каталоге проекта запустите:
+
 ```bash
 docker build --tag devman_bot .
 ```
