@@ -14,11 +14,11 @@ def bot_send_messages(bot, chat_id, server_answer):
     for attempt in server_answer['new_attempts']:
         title =f'У Вас проверили работу:\n {attempt["lesson_title"]}'
         if attempt['is_negative']:
-            correct = '_К сожалению, в работе нашлись ошибки_'
+            correct = 'К сожалению, в работе нашлись ошибки'
         else:
             correct = (
-                f'_Преподавателю все понравилось\n'
-                f'Можете приступать к следующему заданию_'
+                f'Преподавателю все понравилось\n'
+                f'Можете приступать к следующему заданию'
             )
         link = f'[Ссылка на Вашу работу]({attempt["lesson_url"]})'
         bot.send_message(
