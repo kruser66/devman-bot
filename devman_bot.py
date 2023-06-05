@@ -84,6 +84,7 @@ if __name__ == '__main__':
         'timestamp': None,
     }
 
+    timeout = 60
     while True:
         try:
             response, params = long_polling(
@@ -93,10 +94,15 @@ if __name__ == '__main__':
                 chat_id,
                 timeout=10,
             )
+            timeout = 60
         except requests.exceptions.ReadTimeout:
             pass
-        except requests.exceptions.ConnectionError:
-            logger.exception('devman_bot error!')
-            sleep(10)
-        except Exception:
-            logger.exception('devman_bot error!')
+        except requests.exceptions.ConnectionError as err:
+            logger.exception('devman_bot error!', err)
+            sleep(timeout)
+        except requests.exceptions.ConnectTimeout as err:
+            logger.exception('devman_bot error!', err)
+            sleep(timeout)
+            timeout += timeout
+        except Exception as err:
+            logger.exception('devman_bot error!', err)
